@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -9,8 +9,8 @@ namespace TestMatch.ViewModels
 
     using System;
     using System.Collections.ObjectModel;
-    using System.ComponentModel; // Added for INotifyPropertyChanged
-    using System.Runtime.CompilerServices; // Added for CallerMemberName
+    using System.ComponentModel; 
+    using System.Runtime.CompilerServices; 
 
     public class ConsoleViewModel : INotifyPropertyChanged
     {
@@ -18,17 +18,15 @@ namespace TestMatch.ViewModels
 
         public void AddLogLine(string message)
         {
-            // Ensure UI updates from background threads safely
             System.Windows.Application.Current.Dispatcher.Invoke(() =>
             {
                 LogOutput.Add($"[{DateTime.Now:HH:mm:ss}] {message}");
             });
         }
 
-        // --- Fixes the compiler error ---
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
 
-        protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
