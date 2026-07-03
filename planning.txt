@@ -1,0 +1,63 @@
+short length full
+wide off length
+
+
+7 | 8 | 9
+----------
+3 | 5 | 6
+----------
+1 | 2 | 3
+
+
+bowler attributes
+pace
+accuracy
+fitness
+fatigue (fitness based modifier)
+stock (deliveries)
+variation
+
+deliveries
+----------
+9 straight
+8 inswinger
+7 outswinger
+6 offcutter
+5 legcutter
+4 offspinner
+3 legspinner
+2 armball
+1 googly
+
+pace
+----
+9 150+ (fast)
+8 140+ (fastmedium)
+7 130+ (mediumfast)
+6 120+ (medium)
+5 110+ (rarely used - slower ball)
+4 100+ (rarely used - slower ball)
+3 90+ (quickspinner)
+2 80+ (regularspinner)
+1 70+ (slowspinner)
+
+fatigue
+decrease x for every over
+multiply effect by 1.5 for consecutive effort balls
+increase x for every 5 overs not bowled
+multiply effect by 2 for drinks, 3 for tea, 4 for lunch
+
+ball condition
+9 less than 10 overs swing+, pace+
+8 10 overs swing+ 
+7 20 overs no effect
+6 30 overs no effect
+5 40 overs spin+
+4 50 overs spin++
+3 60 overs spin++, pace-
+2 70 overs sping+++, pace-
+1 80 overs sping+++, pace--
+
+Random event can affect ball condition, can ask for ball to be replaced (50% chance)
+
+RNG
