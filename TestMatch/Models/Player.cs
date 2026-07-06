@@ -9,6 +9,8 @@ namespace TestMatch.Models
         public int Stock { get; set; } = 0;
         public int Variation { get; set; } = 0;
 
+        public int Health { get; set; } = 0;
+
 
         public Player()
         {
@@ -23,6 +25,9 @@ namespace TestMatch.Models
             Fitness = fitness;
             Stock = stock;
             Variation = variation;
+
+            // Set intial health value based on fitness to modified as game progresses
+            Health = fitness;
         }
 
     }
