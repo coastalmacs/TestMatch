@@ -44,7 +44,7 @@ namespace TestMatch.Models
                 return team; // Empty file or header only
             }
 
-            // Line 0 is header: Name,Pace,Accuracy,Fitness,Stock,Variation
+            // Line 0 is header: Name,RightHanded,Fitness,BattingOrder,Concentration,Aggression,BattingStrength,BattingWeakness,Pace,Accuracy,StockBall,VariationBall
             for (int i = 1; i < lines.Length; i++)
             {
                 string line = lines[i].Trim();
@@ -54,17 +54,80 @@ namespace TestMatch.Models
                 }
 
                 string[] parts = line.Split(',');
-                if (parts.Length >= 6)
+                if (parts.Length < 13)
                 {
-                    string name = parts[0].Trim();
-                    int pace = int.TryParse(parts[1].Trim(), out int p) ? p : 0;
-                    int accuracy = int.TryParse(parts[2].Trim(), out int a) ? a : 0;
-                    int fitness = int.TryParse(parts[3].Trim(), out int f) ? f : 0;
-                    int stock = int.TryParse(parts[4].Trim(), out int s) ? s : 0;
-                    int variation = int.TryParse(parts[5].Trim(), out int v) ? v : 0;
+                    throw new InvalidDataException($"Line {i + 1} is invalid: Expected 13 values, but got {parts.Length}.");
+                }
 
-                    Player player = new Player(name, pace, accuracy, fitness, stock, variation);
-                    team.Players.Add(player);
+                string firstName = parts[0].Trim();
+                if (string.IsNullOrEmpty(firstName))
+                {
+                    throw new InvalidDataException($"Line {i + 1} is invalid: Player FirstName cannot be empty.");
+                }
+
+                string lastName = parts[1].Trim();
+                if (string.IsNullOrEmpty(lastName))
+                {
+                    throw new InvalidDataException($"Line {i + 1} is invalid: Player LastName cannot be empty.");
+                }
+
+                if (!bool.TryParse(parts[2].Trim(), out bool rightHanded))
+                {
+                    throw new InvalidDataException($"Line {i + 1} is invalid: Unable to parse RightHanded boolean value '{parts[2]}'.");
+                }
+
+                if (!int.TryParse(parts[3].Trim(), out int fitness))
+                {
+                    throw new InvalidDataException($"Line {i + 1} is invalid: Unable to parse Fitness integer '{parts[3]}'.");
+                }
+
+                if (!int.TryParse(parts[4].Trim(), out int battingOrder))
+                {
+                    throw new InvalidDataException($"Line {i + 1} is invalid: Unable to parse BattingOrder integer '{parts[4]}'.");
+                }
+
+                if (!int.TryParse(parts[5].Trim(), out int concentration))
+                {
+                    throw new InvalidDataException($"Line {i + 1} is invalid: Unable to parse Concentration integer '{parts[5]}'.");
+                }
+
+                if (!int.TryParse(parts[6].Trim(), out int aggression))
+                {
+                    throw new InvalidDataException($"Line {i + 1} is invalid: Unable to parse Aggression integer '{parts[6]}'.");
+                }
+
+                string battingStrength = parts[7].Trim();
+                string battingWeakness = parts[8].Trim();
+
+                if (!int.TryParse(parts[9].Trim(), out int pace))
+                {
+                    throw new InvalidDataException($"Line {i + 1} is invalid: Unable to parse Pace integer '{parts[9]}'.");
+                }
+
+                if (!int.TryParse(parts[10].Trim(), out int accuracy))
+                {
+                    throw new InvalidDataException($"Line {i + 1} is invalid: Unable to parse Accuracy integer '{parts[10]}'.");
+                }
+
+                string stockBall = parts[11].Trim();
+                string variationBall = parts[12].Trim();
+
+                Player player = new Player(firstName, lastName, rightHanded, fitness, battingOrder, concentration, aggression, battingStrength, battingWeakness, pace, accuracy, stockBall, variationBall);
+                team.Players.Add(player);
+            }
+
+            if (team.Players.Count < 11)
+            {
+                throw new InvalidDataException($"Team '{teamName}' must have at least 11 players. Loaded {team.Players.Count}.");
+            }
+
+            // Verify batting order sequentially from 1 to 11
+            var sortedPlayers = System.Linq.Enumerable.ToList(System.Linq.Enumerable.OrderBy(team.Players, p => p.BattingOrder));
+            for (int j = 0; j < 11; j++)
+            {
+                if (sortedPlayers[j].BattingOrder != j + 1)
+                {
+                    throw new InvalidDataException($"Invalid batting order sequence: Expected batting position {j + 1}.");
                 }
             }
 

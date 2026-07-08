@@ -1,4 +1,4 @@
-short length full
+short good full
 wide off leg
 
 
@@ -19,35 +19,42 @@ variation
 
 variation
 ---------
-9 straight no movement
-8 inswinger to leg, full movement++, length movement+  
-7 outswinger no off, full movement++, length movement+
-6 offcutter to leg, full movement+, length movement++
-5 legcutter to off, full movement+, length movement++
-4 offspinner to leg, full movement+, length movement++
-3 legspinner to off, full movement+, length movement++
-2 armball to off, full movement+, length movement++
-1 googly to leg, full movement+, length movement++
+value, enum, label, effect, description
+9, straight, "Straight", no movement
+8, inswinger to leg, full movement++, length movement+  
+7, outswinger no off, full movement++, length movement+
+6, offcutter to leg, full movement+, length movement++
+5, legcutter to off, full movement+, length movement++
+4, offspinner to leg, full movement+, length movement++
+3, legspinner to off, full movement+, length movement++
+2, armball to off, full movement+, length movement++
+1, googly to leg, full movement+, length movement++
+0, reserved
+
 
 pace
 ----
-9 150+ (fast)
-8 140+ (fastmedium)
-7 130+ (mediumfast)
-6 120+ (medium)
-5 110+ (rarely used - slower ball)
-4 100+ (rarely used - slower ball)
-3 90+ (quickspinner)
-2 80+ (regularspinner)
-1 70+ (slowspinner)
+value, enum, label, description 
+9, fast, "Fast", 150 and above
+8, fastmedium, "Fast-medium", 140-149
+7, mediumfast, "Medium-fast", 130-139
+6, medium, "Medium", 120-129
+5, slow, "Slow", 110-119
+4, slowerball, "Slower ball", 100-109
+3, spinerquick, "Spinner (quick)", 90-99
+2, spinnermedium, "Spinner (medium)", 80-89
+1, spinnerslow, "Spinner (slow)", 70-79
+0, dead
 
 health
+------
 decrease x for every over
 multiply effect by 1.5 for consecutive effort balls
 increase x for every 5 overs not bowled
 multiply effect by 2 for drinks, 3 for tea, 4 for lunch
 
 ball condition
+--------------
 9 0 overs swing++, pace++
 8 10 overs swing+, pace+ 
 7 20 overs pace+
@@ -57,8 +64,10 @@ ball condition
 3 60 overs spin++, pace-
 2 70 overs sping+++, pace-
 1 80 overs sping+++, pace--
+0 unusable
 
 pitch condition
+---------------
 9 wet ballcondition-
 8 green pace++
 7 green pace+
@@ -68,8 +77,10 @@ pitch condition
 3 dry pace- (pace 6-9 only), movement++ (pace 1-3 only)
 2 dusty pace-- (pace 6-9 only), movement++ (pace 1-3 only)
 1 crumbly ballcondition-, pace--- (pace 6-9 only) movement+++ (pace 1-3 only)
+0 unuseable
 
 weather
+-------
 9 hot
 8 overcast
 7 
@@ -79,12 +90,14 @@ weather
 3
 2
 1 wet
+0 abandoned
 
 
 
 reevaluate every 10 overs based on forecast
 
 wind
+----
 9 strong northerly
 8 medium northerly
 7 light northerly
@@ -94,10 +107,12 @@ wind
 3 light southerly
 2 medium southerly
 1 strong northerly
+0 reserved
 
 reevaluate every 10 overs
 
 temperature
+-----------
 9 >40
 8 35-40
 7 30-35
@@ -115,8 +130,6 @@ capped based on location
 
 Random event can affect ball condition, can ask for ball to be replaced (50% chance)
 
-weather
-
 
 RNG
 Delivery attributes
@@ -125,16 +138,6 @@ pace
 line
 length
 movement
-
-Delivery inputs
----------------
-player fixed attributes (pace, accuracy, fitness)
-player variable attributes (vitality)
-delivery attributes effort
-target
-variation
-condition
-
 
 Need to prevent 10 ball overs
 Maybe force legal deliveries at 0.9 with speed penalty?
@@ -153,3 +156,60 @@ need a reward payoff
 Ideas
 -----
 Generate forecast for match for weather conditions
+
+
+Bowl logic
+----------
+read player.pace .accuracy .vitality .stockBall .variationBall
+read effort target
+read innings.pitchCondition .ballCondition
+determine no ball
+    - call noball rnd 100 (pace) rnd 200 (spin)
+    - double frequency if effort ball
+calculate speed
+    - set speed to pace
+    - calculate pitchCondition and ballCondition modifiers (omit)
+    - calculate effort modifier
+        - if effort, speed += 1
+    - calculate health modifier
+        - 1-3 speed -=2
+        - 4-6 speed -=1
+        - 7-9 no effect
+calculate length
+    - covert target to length
+        - short 7,8,9 - length = 8
+        - good 4,5,6 - length = 5
+        - full 1,2,3 - length = 2
+    - calculate accuracy and health modifier
+        - Sum accuracy and health
+            - 2-6 modifier 3
+            - 7-11 modifier 2
+            - 12-16 modifer 1
+            - 17-18 modifer 0
+        - Randomise fuller or shorter (positive or negative length modifier)
+    - calculate length
+        - Add modifiers to length
+            - Cannot exceed bounds of 1-9
+            - Consider possibility of >9 wide and <1 noball
+calculate line
+    - covert target to line
+        - wide 1,4,7 - line = 2
+        - off 2,5,8 - line = 5
+        - leg 3,6,9 - line = 8
+    - calculate accuracy and health modifier
+        - Sum accuracy and health
+            - 2-6 modifier 3
+            - 7-11 modifier 2
+            - 12-14 modifer 1
+            - 15-18 modifer 0
+        - Randomise fuller or shorter (positive or negative length modifier)
+    - calculate length
+        - Add modifiers to length
+            - If >9 wide and <1 wide
+            - Cannot exceed bounds of 1-9 so limit after checking for wide
+calculate movement
+    - to do
+
+Bat logic
+---------
+

@@ -1,6 +1,12 @@
-Name,Pace,Accuracy,Fitness,Stock,Variation
-Pat Cummins,8,8,9,8,8
-Mitchell Starc,9,7,8,7,8
-Josh Hazlewood,7,9,6,9,7
-Nathan Lyon,2,9,7,7,9
-Cameron Green,7,7,7,7,7
+FirstName,LastName,RightHanded,Fitness,BattingOrder,Concentration,Aggression,BattingStrength,BattingWeakness,Pace,Accuracy,StockBall,VariationBall
+Usman,Khawaja,false,1,1,5,4,leave,pull,1,1,none,none
+Marnus,Labuschagne,true,9,2,9,5,drive,straight,2,3,legspinner,straight
+Steven,Smith,true,9,3,9,5,flick,short,1,2,legspinner,straight
+Travis,Head,false,8,4,7,9,cut,short,1,2,offspinner,straight
+Alex,Carey,false,9,5,8,6,sweep,short,5,5,none,none
+Mitchell,Marsh,true,8,6,7,8,drive,short,6,6,straight,outswinger
+Cameron,Green,true,8,7,8,7,drive,pull,7,7,outswinger,legcutter
+Pat,Cummins,true,9,8,8,6,straight,short,8,7,outswinger,inswinger
+Mitchell,Starc,false,8,9,6,7,straight,short,9,7,inswinger,outswinger
+Nathan,Lyon,true,7,10,7,4,sweep,short,2,9,offspinner,straight
+Josh,Hazlewood,true,8,11,7,5,straight,short,7,9,straight,outswinger

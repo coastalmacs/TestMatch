@@ -29,10 +29,49 @@ namespace TestMatch
             _viewModel = new TestMatch.ViewModels.ConsoleViewModel();
             DataContext = _viewModel;
 
-            // Set focus to the input text box on window load
-            Loaded += (sender, e) => InputTextBox.Focus();
+            // Set focus to the window on load so key inputs are captured immediately
+            Loaded += (sender, e) => this.Focus();
+            PreviewKeyDown += MainWindow_KeyDown;
 
             Init();
+        }
+
+        private void MainWindow_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key >= Key.D1 && e.Key <= Key.D9)
+            {
+                int target = e.Key - Key.D1 + 1;
+                DoSomething(target);
+            }
+            else if (e.Key >= Key.NumPad1 && e.Key <= Key.NumPad9)
+            {
+                int target = e.Key - Key.NumPad1 + 1;
+                DoSomething(target);
+            }
+            else if (e.Key == Key.D0 || e.Key == Key.NumPad0)
+            {
+                EffortToggleButton.IsChecked = EffortToggleButton.IsChecked != true;
+            }
+            else if (e.Key == Key.Decimal || e.Key == Key.OemPeriod)
+            {
+                VariationToggleButton.IsChecked = VariationToggleButton.IsChecked != true;
+            }
+            else if (e.Key == Key.Up)
+            {
+                if (BowlersListBox.SelectedIndex > 0)
+                {
+                    BowlersListBox.SelectedIndex--;
+                }
+                e.Handled = true;
+            }
+            else if (e.Key == Key.Down)
+            {
+                if (BowlersListBox.SelectedIndex < BowlersListBox.Items.Count - 1)
+                {
+                    BowlersListBox.SelectedIndex++;
+                }
+                e.Handled = true;
+            }
         }
 
         private void LogScrollViewer_ScrollChanged(object sender, ScrollChangedEventArgs e)
@@ -43,78 +82,112 @@ namespace TestMatch
             }
         }
 
-        private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            if (sender is TextBox textBox)
-            {
-                // Temporarily detach the event handler to avoid re-entrancy issues
-                textBox.TextChanged -= TextBox_TextChanged;
-                try
-                {
-                    string text = textBox.Text;
-                    if (!string.IsNullOrEmpty(text))
-                    {
-                        // Check if the input is a single digit 0-9 (0 used for effort ball)
-                        if (text.Length == 1 && text[0] >= '0' && text[0] <= '9')
-                        {
-                            if (text[0] == '0')
-                            {
-                                EffortToggleButton.IsChecked = EffortToggleButton.IsChecked != true;
-                            }
-                            else
-                            {
-                                DoSomething(int.Parse(text));
-                            }
-                        }
-
-
-
-                        // Always ensure the text box is cleared after processing
-                        textBox.Clear();
-                    }
-                }
-                finally
-                {
-                    // Re-attach the event handler
-                    textBox.TextChanged += TextBox_TextChanged;
-                }
-            }
-        }
-
-        private void TextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
-        {
-            // Only allow characters '0'-'9' to be entered
-            e.Handled = e.Text.Length != 1 || e.Text[0] < '0' || e.Text[0] > '9';
-        }
-
 
         private void Init()
         {
             try
             {
-
                 // Load Australia team sheet for testing
                 string rosterPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", "australia.csv");
                 Team australia = Team.LoadFromCsv(rosterPath);
                 
-                _viewModel.AddLogLine($"Loaded team: {australia.Name}");
-                foreach (var player in australia.Players)
+                // Sort players by batting order ascending
+                var sortedPlayers = System.Linq.Enumerable.ToList(System.Linq.Enumerable.OrderBy(australia.Players, p => p.BattingOrder));
+
+                BowlersListBox.ItemsSource = sortedPlayers;
+                
+                // Automatically select player with BattingOrder == 11 (tailender bowler) as the default first bowler
+                var defaultBowler = System.Linq.Enumerable.FirstOrDefault(sortedPlayers, p => p.BattingOrder == 11);
+                if (defaultBowler != null)
                 {
-                    _viewModel.AddLogLine($" - {player.Name} (Pace: {player.Pace}, Accuracy: {player.Accuracy})");
+                    BowlersListBox.SelectedItem = defaultBowler;
+                    session.bowler = defaultBowler;
                 }
+                else if (sortedPlayers.Count > 0)
+                {
+                    BowlersListBox.SelectedIndex = 0;
+                    session.bowler = sortedPlayers[0];
+                }
+                _viewModel.StatusMessage = $"Loaded team: {australia.Name}.";
             }
             catch (Exception ex)
             {
-                _viewModel.AddLogLine($"Error loading default team sheet: {ex.Message}");
+                _viewModel.StatusMessage = $"Error: {ex.Message}";
+            }
+        }
+
+        private void BowlersListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (BowlersListBox.SelectedItem is Player selectedPlayer)
+            {
+                session.bowler = selectedPlayer;
+                _viewModel.StatusMessage = $"Active bowler: {selectedPlayer.Name} (Pace: {selectedPlayer.Pace}, Accuracy: {selectedPlayer.Accuracy}, Health: {selectedPlayer.Health})";
+                BowlersListBox.ScrollIntoView(selectedPlayer);
             }
         }
 
         private void DoSomething(int target)
         {
-            // Simulate a delivery using the EffortToggleButton checked state
+            if (!session.CanBowl(session.bowler, out string errorMessage))
+            {
+                _viewModel.StatusMessage = $"Error: {errorMessage}";
+                return;
+            }
+
+            // Simulate a delivery using toggle button states
             bool isEffortBall = EffortToggleButton.IsChecked == true;
-            var delivery = session.Bowl(isEffortBall, target);
-            _viewModel.AddLogLine($"[{session.OverProgress:0.0} overs] Bowler {session.bowler.Name} aimed at {target}. {delivery}");
+            bool isVariationBall = VariationToggleButton.IsChecked == true;
+            var delivery = session.Bowl(isEffortBall, isVariationBall, target);
+            if (delivery == null)
+            {
+                return;
+            }
+            
+            string legalityStr = delivery.Legality switch
+            {
+                Legality.Legal => "Legal",
+                Legality.NoBall => "No-Ball",
+                Legality.Wide => "Wide",
+                _ => "Unknown"
+            };
+
+            _viewModel.AddLogLine($"[{session.OverProgress:0.0} overs] Bowler {session.bowler.Name} aimed at {target}. Speed: {delivery.Speed}, Line: {delivery.Line}, Length: {delivery.Length} ({legalityStr})");
+            _viewModel.StatusMessage = $"Ready. Last delivery by {session.bowler.Name} (Target: {target}, Speed: {delivery.Speed}, {legalityStr}).";
+
+            // Update health of all players and refresh the ListBox
+            if (BowlersListBox.ItemsSource is System.Collections.Generic.IEnumerable<Player> players)
+            {
+                foreach (var p in players)
+                {
+                    p.Health = session.GetBowlerHealth(p);
+                }
+                BowlersListBox.Items.Refresh();
+
+                // Check if the current over just completed
+                var lastCompletedOver = session.Overs.Count > 0 ? session.Overs[session.Overs.Count - 1] : null;
+                if (lastCompletedOver != null && lastCompletedOver.IsComplete)
+                {
+                    Player? nextDefaultBowler = null;
+                    if (session.Overs.Count == 1)
+                    {
+                        // Over 1 just completed. Default next bowler (for Over 2) is BattingOrder 10.
+                        nextDefaultBowler = System.Linq.Enumerable.FirstOrDefault(players, p => p.BattingOrder == 10);
+                    }
+                    else if (session.Overs.Count >= 2)
+                    {
+                        // Over N just completed. Default next bowler is the one who bowled Over N-1.
+                        var secondToLastOver = session.Overs[session.Overs.Count - 2];
+                        var bowlerFromSecondToLast = secondToLastOver.Bowler;
+                        nextDefaultBowler = System.Linq.Enumerable.FirstOrDefault(players, p => p.Name == bowlerFromSecondToLast.Name);
+                    }
+
+                    if (nextDefaultBowler != null)
+                    {
+                        BowlersListBox.SelectedItem = nextDefaultBowler;
+                        session.bowler = nextDefaultBowler;
+                    }
+                }
+            }
         }
 
     }

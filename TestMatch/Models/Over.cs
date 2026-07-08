@@ -14,6 +14,7 @@ namespace TestMatch.Models
         }
 
         // An over is complete when there are at least 6 legal deliveries
-        public bool IsComplete => Deliveries.Count(d => d.IsLegal) >= 6;
+        public bool IsComplete => Deliveries.Count(d => d.Legality == Legality.Legal) >= 6;
+
     }
 }

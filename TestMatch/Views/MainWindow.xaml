@@ -5,12 +5,15 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TestMatch"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="MainWindow" Height="1560" Width="960" 
+                WindowStartupLocation="Manual" Left="0" Top="0"
+        Background="#121212">
     <Grid>
 
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
 
@@ -18,33 +21,68 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
-            <TextBox x:Name="InputTextBox" Grid.Column="0" Text="" MaxLength="1" FontSize="20" TextChanged="TextBox_TextChanged" PreviewTextInput="TextBox_PreviewTextInput"/>
+            <TextBlock Text="Use keys 1-9 to bowl. Press 0 to toggle Effort. Press . to toggle Variation." Foreground="LightGray" VerticalAlignment="Center" FontSize="16"/>
             <ToggleButton x:Name="EffortToggleButton" Grid.Column="1" Content="Effort Ball" FontSize="16" Margin="10,0,0,0" Padding="10,4"/>
+            <ToggleButton x:Name="VariationToggleButton" Grid.Column="2" Content="Variation Ball" FontSize="16" Margin="10,0,0,0" Padding="10,4"/>
         </Grid>
 
-        <ScrollViewer x:Name="LogScrollViewer" Grid.Row="1" VerticalScrollBarVisibility="Auto" CanContentScroll="True" ScrollChanged="LogScrollViewer_ScrollChanged">
-            <ListBox ItemsSource="{Binding LogOutput}" 
-                 Background="Black" 
-                 Foreground="LightGreen" 
-                 FontFamily="Consolas" 
-                 BorderThickness="0">
-                <ListBox.ItemContainerStyle>
-                    <Style TargetType="ListBoxItem">
-                        <Setter Property="Padding" Value="4,1"/>
-                        <Setter Property="Template">
-                            <Setter.Value>
-                                <ControlTemplate TargetType="ListBoxItem">
-                                    <ContentPresenter />
-                                </ControlTemplate>
-                            </Setter.Value>
-                        </Setter>
-                    </Style>
-                </ListBox.ItemContainerStyle>
-            </ListBox>
-        </ScrollViewer>
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="1*"/>
+            </Grid.ColumnDefinitions>
 
+            <ScrollViewer x:Name="LogScrollViewer" Grid.Column="0" VerticalScrollBarVisibility="Auto" CanContentScroll="True" ScrollChanged="LogScrollViewer_ScrollChanged">
+                <ListBox ItemsSource="{Binding LogOutput}" 
+                     Background="Black" 
+                     Foreground="LightGreen" 
+                     FontFamily="Consolas" 
+                     BorderThickness="0">
+                    <ListBox.ItemContainerStyle>
+                        <Style TargetType="ListBoxItem">
+                            <Setter Property="Padding" Value="4,1"/>
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="ListBoxItem">
+                                        <ContentPresenter />
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </ListBox.ItemContainerStyle>
+                </ListBox>
+            </ScrollViewer>
 
+            <Grid Grid.Column="1" Margin="10,0,10,10">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <Label Content="Bowlers" Foreground="White" FontSize="16" FontWeight="Bold" Margin="0,0,0,5"/>
+                <ListBox x:Name="BowlersListBox" Grid.Row="1" SelectionChanged="BowlersListBox_SelectionChanged" Background="#1E1E1E" Foreground="White" BorderBrush="#3F3F46" BorderThickness="1">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Margin="5">
+                                <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="14"/>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="{Binding Pace, StringFormat='Pace: {0} | '}" FontSize="12" Foreground="LightGray"/>
+                                    <TextBlock Text="{Binding Accuracy, StringFormat='Accuracy: {0} | '}" FontSize="12" Foreground="LightGray"/>
+                                    <TextBlock Text="{Binding Fitness, StringFormat='Fitness: {0} | '}" FontSize="12" Foreground="LightGray"/>
+                                    <TextBlock Text="{Binding Health, StringFormat='Health: {0}'}" FontSize="12" Foreground="LightGray"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </Grid>
+        </Grid>
+
+        <!-- StatusBar at the bottom for program messages -->
+        <StatusBar Grid.Row="2" Background="#1E1E1F" BorderBrush="#3F3F46" BorderThickness="0,1,0,0" Padding="5">
+            <TextBlock Text="{Binding StatusMessage}" Foreground="#A3A3A3" FontSize="14" Margin="10,2"/>
+        </StatusBar>
 
     </Grid>
 </Window>
