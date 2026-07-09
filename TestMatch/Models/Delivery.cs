@@ -11,17 +11,17 @@ namespace TestMatch.Models
 
     public class Delivery
     {
+        // Core delivery attributes
         public int Speed { get; set; } = 0;
         public int Line { get; set; } = 0;
         public int Length { get; set; } = 0;
         public string Movement { get; set; } = string.Empty;
 
+        // Attributes accepted as inputs
         public bool Effort { get; set; } = false;
         public bool Variation { get; set; } = false;
+        
         public Legality Legality { get; set; } = Legality.Legal;
-
-        // Keep IsLegal for backward compatibility with Innings and Over logic
-        public bool IsLegal => Legality == Legality.Legal;
 
         public Delivery()
         {
