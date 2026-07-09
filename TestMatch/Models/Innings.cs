@@ -4,7 +4,7 @@ namespace TestMatch.Models
 {
     public class Innings
     {
-        public Player bowler = new Player("Pat", "Cummins", true, 9, 8, 8, 6, "straight", "short", 8, 7, "outswinger", "inswinger");
+        public Player bowler = new Player("Cummins", "Pat", 8, 6, "straight", "short", 8, 7, "outswinger", "inswinger", 8, 8, 1, 9, 9, true, 8);
 
         public int ballCondition = 9;
         public int pitchCondition;

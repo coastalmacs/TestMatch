@@ -44,7 +44,7 @@ namespace TestMatch.Models
                 return team; // Empty file or header only
             }
 
-            // Line 0 is header: Name,RightHanded,Fitness,BattingOrder,Concentration,Aggression,BattingStrength,BattingWeakness,Pace,Accuracy,StockBall,VariationBall
+            // Line 0 is header: LastName,FirstName,Concentration,Aggression,BattingStrength,BattingWeakness,Pace,Accuracy,StockBall,VariationBall,Fielding,Catching,Keeping,Captaincy,Fitness,RightHanded,BattingOrder
             for (int i = 1; i < lines.Length; i++)
             {
                 string line = lines[i].Trim();
@@ -54,65 +54,85 @@ namespace TestMatch.Models
                 }
 
                 string[] parts = line.Split(',');
-                if (parts.Length < 13)
+                if (parts.Length < 17)
                 {
-                    throw new InvalidDataException($"Line {i + 1} is invalid: Expected 13 values, but got {parts.Length}.");
+                    throw new InvalidDataException($"Line {i + 1} is invalid: Expected 17 values, but got {parts.Length}.");
                 }
 
-                string firstName = parts[0].Trim();
-                if (string.IsNullOrEmpty(firstName))
-                {
-                    throw new InvalidDataException($"Line {i + 1} is invalid: Player FirstName cannot be empty.");
-                }
-
-                string lastName = parts[1].Trim();
+                string lastName = parts[0].Trim();
                 if (string.IsNullOrEmpty(lastName))
                 {
                     throw new InvalidDataException($"Line {i + 1} is invalid: Player LastName cannot be empty.");
                 }
 
-                if (!bool.TryParse(parts[2].Trim(), out bool rightHanded))
+                string firstName = parts[1].Trim();
+                if (string.IsNullOrEmpty(firstName))
                 {
-                    throw new InvalidDataException($"Line {i + 1} is invalid: Unable to parse RightHanded boolean value '{parts[2]}'.");
+                    throw new InvalidDataException($"Line {i + 1} is invalid: Player FirstName cannot be empty.");
                 }
 
-                if (!int.TryParse(parts[3].Trim(), out int fitness))
+                if (!int.TryParse(parts[2].Trim(), out int concentration))
                 {
-                    throw new InvalidDataException($"Line {i + 1} is invalid: Unable to parse Fitness integer '{parts[3]}'.");
+                    throw new InvalidDataException($"Line {i + 1} is invalid: Unable to parse Concentration integer '{parts[2]}'.");
                 }
 
-                if (!int.TryParse(parts[4].Trim(), out int battingOrder))
+                if (!int.TryParse(parts[3].Trim(), out int aggression))
                 {
-                    throw new InvalidDataException($"Line {i + 1} is invalid: Unable to parse BattingOrder integer '{parts[4]}'.");
+                    throw new InvalidDataException($"Line {i + 1} is invalid: Unable to parse Aggression integer '{parts[3]}'.");
                 }
 
-                if (!int.TryParse(parts[5].Trim(), out int concentration))
+                string battingStrength = parts[4].Trim();
+                string battingWeakness = parts[5].Trim();
+
+                if (!int.TryParse(parts[6].Trim(), out int pace))
                 {
-                    throw new InvalidDataException($"Line {i + 1} is invalid: Unable to parse Concentration integer '{parts[5]}'.");
+                    throw new InvalidDataException($"Line {i + 1} is invalid: Unable to parse Pace integer '{parts[6]}'.");
                 }
 
-                if (!int.TryParse(parts[6].Trim(), out int aggression))
+                if (!int.TryParse(parts[7].Trim(), out int accuracy))
                 {
-                    throw new InvalidDataException($"Line {i + 1} is invalid: Unable to parse Aggression integer '{parts[6]}'.");
+                    throw new InvalidDataException($"Line {i + 1} is invalid: Unable to parse Accuracy integer '{parts[7]}'.");
                 }
 
-                string battingStrength = parts[7].Trim();
-                string battingWeakness = parts[8].Trim();
+                string stockBall = parts[8].Trim();
+                string variationBall = parts[9].Trim();
 
-                if (!int.TryParse(parts[9].Trim(), out int pace))
+                if (!int.TryParse(parts[10].Trim(), out int fielding))
                 {
-                    throw new InvalidDataException($"Line {i + 1} is invalid: Unable to parse Pace integer '{parts[9]}'.");
+                    throw new InvalidDataException($"Line {i + 1} is invalid: Unable to parse Fielding integer '{parts[10]}'.");
                 }
 
-                if (!int.TryParse(parts[10].Trim(), out int accuracy))
+                if (!int.TryParse(parts[11].Trim(), out int catching))
                 {
-                    throw new InvalidDataException($"Line {i + 1} is invalid: Unable to parse Accuracy integer '{parts[10]}'.");
+                    throw new InvalidDataException($"Line {i + 1} is invalid: Unable to parse Catching integer '{parts[11]}'.");
                 }
 
-                string stockBall = parts[11].Trim();
-                string variationBall = parts[12].Trim();
+                if (!int.TryParse(parts[12].Trim(), out int keeping))
+                {
+                    throw new InvalidDataException($"Line {i + 1} is invalid: Unable to parse Keeping integer '{parts[12]}'.");
+                }
 
-                Player player = new Player(firstName, lastName, rightHanded, fitness, battingOrder, concentration, aggression, battingStrength, battingWeakness, pace, accuracy, stockBall, variationBall);
+                if (!int.TryParse(parts[13].Trim(), out int captaincy))
+                {
+                    throw new InvalidDataException($"Line {i + 1} is invalid: Unable to parse Captaincy integer '{parts[13]}'.");
+                }
+
+                if (!int.TryParse(parts[14].Trim(), out int fitness))
+                {
+                    throw new InvalidDataException($"Line {i + 1} is invalid: Unable to parse Fitness integer '{parts[14]}'.");
+                }
+
+                if (!bool.TryParse(parts[15].Trim(), out bool rightHanded))
+                {
+                    throw new InvalidDataException($"Line {i + 1} is invalid: Unable to parse RightHanded boolean value '{parts[15]}'.");
+                }
+
+                if (!int.TryParse(parts[16].Trim(), out int battingOrder))
+                {
+                    throw new InvalidDataException($"Line {i + 1} is invalid: Unable to parse BattingOrder integer '{parts[16]}'.");
+                }
+
+                Player player = new Player(lastName, firstName, concentration, aggression, battingStrength, battingWeakness, pace, accuracy, stockBall, variationBall, fielding, catching, keeping, captaincy, fitness, rightHanded, battingOrder);
                 team.Players.Add(player);
             }
 

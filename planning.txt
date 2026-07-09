@@ -1,12 +1,31 @@
-short good full
-wide off leg
+target (main bowler input)
+--------------------------
+short, good, full
+wide, off, leg
 
 
-7 | 8 | 9
-----------
-4 | 5 | 6
-----------
-1 | 2 | 3
+short   7 | 8 | 9
+        ----------
+good    4 | 5 | 6
+        ----------
+full    1 | 2 | 3
+
+        w   o   l
+
+9 shortandleg
+8 shortandoff
+7 shortandwide
+6 goodandleg
+5 goodandoff
+4 goodandwide
+3 fullandleg
+2 fullandoff
+1 fullandwide
+
+additional bowler inputs
+------------------------
+effort (bool)
+variation (bool)
 
 
 bowler attributes
@@ -17,7 +36,7 @@ fitness
 health (fitness based modifier)
 variation
 
-variation
+variation 
 ---------
 value, enum, label, effect, description
 9, straight, "Straight", no movement
@@ -31,6 +50,27 @@ value, enum, label, effect, description
 1, googly to leg, full movement+, length movement++
 0, reserved
 
+BattingStrength (area of ground or strokes?)
+9
+8
+7
+6
+5
+4
+3
+2
+1
+
+BattingWeakness (line, length or variation)
+9 short
+8 full
+7 wide
+6 leg
+5 inswinger
+4 outswinger
+3 
+2
+1
 
 pace
 ----
@@ -212,4 +252,93 @@ calculate movement
 
 Bat logic
 ---------
+Two of three, use other mechanism for third
+Look to leg, straight, off 
+Look to get forward, crease, back
+
+
+intent (main batsman input)
+---------------------------
+back, crease, full
+offside, straightbat, legside
+
+
+back     7 | 8 | 9
+         ----------
+crease   4 | 5 | 6
+         ----------
+front    1 | 2 | 3
+
+         o   s   l
+
+
+additional batting inputs
+-------------------------
+attack (bool)
+singles (bool) ?
+
+attack toggle, if so will not play defensive stroke
+increased likelihood of hitting in air
+chance of success linked to aggression attribute
+
+push singles increased chance of runout, 
+
+strokes with corrresponding sectors
+1 latecut
+2 cut
+3 coverdrive
+4 offdrive
+5 ondrive
+6 sweep
+7 pull
+8 hook
+9 glance
+
+
+fielding positions
+9 sectors
+3 rings - 1 catching, 2 infield, 3 outfield
+1 fielder per segment except keeper (mandatory) and up to 3 slips in 1.1
+possible to put three behind leg and be noballed
+
+1.1 slips
+1.2 flyslip
+1.3 thirdman
+2.1 gully
+2.2 point   
+2.3 deeppoint
+3.1 sillypoint
+3.2 cover
+3.3 deepcover
+4.1 sillymidoff
+4.2 midoff
+4.3 longoff
+5.1 sillymidon
+5.2 midon
+5.3 longon
+6.1 shortmidwicket
+6.2 midwicket
+6.3 deepmidwicket
+7.1 shortleg
+7.2 squareleg
+7.3 deepsquareleg
+8.1 leggully
+8.2 backwardsquare
+8.3 deepbackwardsquare
+9.1 legslip
+9.2 shortfineleg
+9.3 fineleg
+
+
+
+
+Minimal Viable Product
+- Single test match - no ground conditions
+- Bowling and batting
+
+Addtional features
+- Match history and player statistics
+- Internal team editor
+- Weather
+- Random events
 
